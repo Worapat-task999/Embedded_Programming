@@ -1,0 +1,64 @@
+#include <DHT.h>                // Include DHT sensor library
+#include <Wire.h>               // Include I2C bus library
+#include <LiquidCrystal_I2C.h>  // Include LCD-I2C bus library
+#define DHTTYPE DHT11           // Define type of sensor 
+#define DHTPIN  D4              // Define connected pin
+#define sw1 D1
+int st_sw1=0;
+int hit=-1;
+
+// Set the LCD address to 0x27/0X3F for I2C-LCD16x2 module
+LiquidCrystal_I2C lcd(0x27, 16, 2); 
+ 
+DHT dht(DHTPIN, DHTTYPE, 15);   // Initial DHT sensor
+
+void setup() 
+{
+  pinMode(sw1,INPUT);
+  dht.begin();                  // Start DHT sensor operation
+  lcd.begin();                  // Start LCD operation
+  lcd.backlight();              // Turn on backlight of LCD
+  lcd.setCursor(0, 0);          // Set LCD home position
+  lcd.print("Worapat");       // Print Humidity message
+  lcd.setCursor(3, 1);          // Set LCD home position of 2nd line
+  lcd.print("Kumpra");           // Print Temperature message
+}
+void loop() 
+{
+  st_sw1 = digitalRead(sw1);
+  if(st_sw1 == LOW){
+          hit++;
+    if(hit==0){ 
+                lcd.setCursor(0, 0);          
+                lcd.print("      ");       
+                lcd.setCursor(3, 1);          
+                lcd.print("      ");
+                float temp = dht.readTemperature();
+                lcd.setCursor(0, 0);
+                lcd.print("Temp="); 
+                lcd.print(temp + String("C"));
+                delay(1000); 
+              }
+    if(hit==1){
+                lcd.setCursor(0, 0);
+                lcd.print("            ");
+                float humid = dht.readHumidity();
+                lcd.setCursor(0, 0);
+                lcd.print("Humidity=");*
+                lcd.print(humid + String("%"));
+                delay(1000); 
+              }
+     if(hit==2){
+                lcd.setCursor(0, 0);
+                lcd.print("                ");
+                lcd.setCursor(0, 0);          
+                lcd.print("Worapat");       
+                lcd.setCursor(3, 1);          
+                lcd.print("Kumpra");
+                hit=-1;
+                }
+                
+    }
+    
+ 
+}

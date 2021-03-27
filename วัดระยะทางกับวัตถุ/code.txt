@@ -1,0 +1,68 @@
+#include <Wire.h>               // Include I2C bus library
+#include <LiquidCrystal_I2C.h>  // Include LCD-I2C bus library
+#define TRIGPIN D5
+#define ECHOPIN D6
+#define sw1 D1
+int st_sw1=0;
+int hit=-1;
+
+// Set the LCD address to 0x27/0X3F for I2C-LCD16x2 module
+LiquidCrystal_I2C lcd(0x27, 16, 2); 
+
+void setup() {
+  pinMode(sw1,INPUT);
+  lcd.begin();                  // Start LCD operation
+  lcd.backlight();              // Turn on backlight of LCD
+  lcd.setCursor(0, 0);          // Set LCD home position
+  lcd.print("Worapat");       // Print Humidity message
+  lcd.setCursor(3, 1);          // Set LCD home position of 2nd line
+  lcd.print("Kumpra");           // Print Temperature message
+  Serial.begin(9600);
+  pinMode(TRIGPIN,OUTPUT);
+  pinMode(ECHOPIN,INPUT);
+}
+
+void loop() {
+  st_sw1 = digitalRead(sw1);
+  int distance,cm,inches;
+  digitalWrite(TRIGPIN,LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIGPIN,HIGH);
+  delayMicroseconds(5);
+  digitalWrite(TRIGPIN,LOW);
+  distance = pulseIn(ECHOPIN,HIGH);
+  if(st_sw1==LOW){
+      hit++;
+    if(hit==0){
+      lcd.clear();
+      cm = microsecondsToCentimeters(distance);
+      lcd.setCursor(0, 0);
+      lcd.print("Distance ="); 
+      lcd.print(cm + String("CM"));
+      Serial.print(cm);
+      Serial.println("cm");
+      delay(200);
+    }if(hit==1){
+     
+      lcd.clear();
+      inches = microsecondsToInches(distance);
+      lcd.setCursor(0, 0);
+      lcd.print("Distance ="); 
+      lcd.print(inches + String("Inches"));
+      Serial.print(inches);
+      Serial.println("Inches");
+      delay(200);
+      hit=-1;
+    }
+  }
+ 
+}
+int microsecondsToCentimeters(int microseconds)
+{
+  return microseconds/60;
+}
+
+int microsecondsToInches(int microseconds)
+{
+  return microseconds/74 / 2;
+}
