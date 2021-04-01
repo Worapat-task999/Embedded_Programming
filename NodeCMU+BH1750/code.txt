@@ -1,0 +1,58 @@
+#include <Wire.h>               // Include I2C bus library
+#include <LiquidCrystal_I2C.h>  // Include LCD-I2C bus library
+#include <BH1750.h>
+#define sw1 D1
+BH1750 lightMeter;
+int st_sw1=0;
+int hit=-1;
+
+// Set the LCD address to 0x27/0X3F for I2C-LCD16x2 module
+LiquidCrystal_I2C lcd(0x27, 16, 2); 
+ 
+
+void setup() 
+{
+  Wire.begin();
+  Serial.begin(9600);
+  pinMode(sw1,INPUT);
+  lightMeter.begin();
+  lcd.begin();                  // Start LCD operation
+  lcd.backlight();              // Turn on backlight of LCD
+  lcd.setCursor(0, 0);          // Set LCD home position
+  lcd.print("Worapat");       // Print Humidity message
+  lcd.setCursor(3, 1);          // Set LCD home position of 2nd line
+  lcd.print("Kumpra");           // Print Temperature message
+}
+void loop() 
+{
+  float lux = lightMeter.readLightLevel();
+  Serial.print(lux);
+  st_sw1 = digitalRead(sw1);
+  if(st_sw1 == LOW){
+            delay(100); 
+          lcd.clear();
+          hit++;
+          delay(100); 
+            
+  }  
+    if(hit==0){ 
+              lcd.clear();
+                lcd.setCursor(0, 0);
+                lcd.print("Light ="); 
+                lcd.print(lux + String("LUX"));
+                delay(100); 
+              }
+    if(hit==1){
+              lcd.clear();
+                lcd.print("Worapat");       
+                lcd.setCursor(3, 1);          
+                lcd.print("Kumpra");
+                delay(100); 
+                hit=-1;
+              }
+    
+                
+        
+ 
+}
+
